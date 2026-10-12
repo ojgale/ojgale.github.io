@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import WorkRows from '../../components/WorkRows.astro';
+import { getProjects } from '../../lib/projects';
+const projects = await getProjects();
+const types = ['Assembled', 'Curated', 'Researched'];
+---
+<Base title="Work" ground="ink" current="work">
+  <div slot="hero" class="wrap" style="padding-top: 40px; padding-bottom: 64px;">
+    <h1 class="display" style="font-size: clamp(40px, 6vw, 72px);">Work, <span class="pop">by role.</span></h1>
+    <p style="max-width: 46ch; margin: 20px 0 0;">Assembled: partnerships and programs I built. Curated: platforms where I shaped the conversation. Researched: work where the finding was the deliverable.</p>
+  </div>
+  <section class="wrap" style="padding-top: 48px; padding-bottom: 96px;">
+    <div class="btn-row" role="group" aria-label="Filter by type" style="margin-bottom: 28px;" data-filters hidden>
+      <button class="chip-btn" type="button" aria-pressed="true" data-f="all">All</button>
+      {types.map((t) => <button class="chip-btn" type="button" aria-pressed="false" data-f={t}>{t}</button>)}
+    </div>
+    <WorkRows projects={projects} showType />
+  </section>
+  <script is:inline>
+    (function () {
+      var box = document.querySelector('[data-filters]'); if (!box) return;
+      box.hidden = false;
+      var items = document.querySelectorAll('[data-rows] li');
+      box.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return;
+        box.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        var f = b.getAttribute('data-f');
+        items.forEach(function (li) { li.hidden = !(f === 'all' || li.getAttribute('data-type') === f); });
+      });
+    })();
+  </script>
+</Base>
