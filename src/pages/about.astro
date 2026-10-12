@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import { getEntry, render } from 'astro:content';
+import { url } from '../lib/projects';
+const page = await getEntry('pages', 'about');
+const { Content } = await render(page);
+---
+<Base title="About" ground="marigold" current="about">
+  <div slot="hero" class="wrap" style="padding-top: 40px; padding-bottom: 64px;">
+    <h1 class="display" style="font-size: clamp(40px, 6vw, 72px);">Olivia Gale, <span class="pop">{page.data.phrase}.</span></h1>
+  </div>
+  <section class="wrap about" style="padding-top: 64px; padding-bottom: 96px;">
+    <figure class="portrait">
+      <img src={url('/images/portrait.jpg')} alt="Olivia Gale, standing outdoors in a red jacket" width="900" height="1350" />
+    </figure>
+    <div class="prose"><Content /></div>
+  </section>
+</Base>
+<style>
+  .about { display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start; }
+  .portrait { flex: 0 1 320px; margin: 0; }
+  .portrait img { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; }
+  .prose { flex: 1 1 420px; min-width: 0; max-width: var(--measure); }
+  .prose :global(p:first-child) { font-size: clamp(22px, 2.4vw, 28px); line-height: 1.35; font-weight: 500; margin-top: 0; }
+  .prose :global(h2) { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--plum); margin: 36px 0 10px; padding-top: 16px; border-top: 1px solid var(--rule); }
+  .prose :global(ul) { padding-left: 20px; margin: 0; }
+</style>

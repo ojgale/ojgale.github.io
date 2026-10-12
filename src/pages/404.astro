@@ -1,0 +1,10 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/projects';
+---
+<Base title="Not found" ground="pink">
+  <div slot="hero" class="wrap" style="padding-top: 40px; padding-bottom: 96px;">
+    <h1 class="display" style="font-size: clamp(40px, 6vw, 72px);">This page <span class="pop">isn't here.</span></h1>
+    <p><a href={url('/')}>Go to the homepage</a></p>
+  </div>
+</Base>

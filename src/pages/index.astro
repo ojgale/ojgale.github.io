@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import WorkRows from '../components/WorkRows.astro';
+import { getProjects, url } from '../lib/projects';
+import site from '../site.config.json';
+
+const projects = (await getProjects()).filter((p) => p.data.featured);
+const words = `${site.statement}`.split(' ');
+const rest = site.statementRest.split(' ');
+const step = 45; // ms between words
+---
+<Base rotateLead current="home">
+  <div slot="hero" class="wrap" style="padding-top: 56px; padding-bottom: 88px;">
+    <h1 class="display reveal" style="font-size: clamp(34px, 5.2vw, 64px); line-height: 1.08; letter-spacing: -0.015em; max-width: 24ch;">
+      {words.map((w, i) => <span class="w" style={`animation-delay:${i * step}ms`}>{w}&nbsp;</span>)}<span class="w pop" style={`animation-delay:${(words.length + rest.length) * step}ms`}>{site.statementPop}</span>{' '}
+      {rest.map((w, i) => <span class="w" style={`animation-delay:${(words.length + i) * step}ms; font-weight: 400;`}>{w}&nbsp;</span>)}
+    </h1>
+  </div>
+  <div class="stripe" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+  <section class="wrap" style="padding-top: 56px; padding-bottom: 96px;" aria-labelledby="sel">
+    <p class="mono" style="margin: 0 0 40px; max-width: 70ch; text-transform: none; letter-spacing: 0.02em; font-size: 14px;">{site.now}</p>
+    <h2 id="sel" class="label muted" style="padding-bottom: 10px;">Selected work</h2>
+    <WorkRows projects={projects} />
+    <p class="mono" style="margin-top: 24px;"><a href={url('/work/')}>All work &rarr;</a></p>
+  </section>
+</Base>
