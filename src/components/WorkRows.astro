@@ -1,0 +1,39 @@
+---
+import { url } from '../lib/projects';
+const { projects, showType = false } = Astro.props;
+---
+<ul class="rows" data-rows>
+  {projects.map((p) => (
+    <li class="fade" data-type={p.data.type}>
+      <a class="row" href={url(`/work/${p.id}/`)} data-color={p.data.ground}
+         data-thumb={p.data.images[0] ? url(p.data.images[0].src) : ''}
+         style={`--dark: var(--${p.data.duotone.dark}); --light: var(--${p.data.duotone.light});`}>
+        <span class="t">{p.data.title}</span>
+        <span class="s">{p.data.summary}</span>
+        <span class="m label">{showType ? `${p.data.type} · ` : ''}{p.data.year}</span>
+      </a>
+    </li>
+  ))}
+</ul>
+<div class="thumb texture" aria-hidden="true" data-thumb-el></div>
+<script is:inline>
+  (function () {
+    var thumb = document.querySelector('[data-thumb-el]');
+    if (!thumb || matchMedia('(hover: none), (prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('[data-rows] .row').forEach(function (row) {
+      row.addEventListener('mouseenter', function () {
+        var src = row.getAttribute('data-thumb');
+        thumb.style.setProperty('--dark', row.style.getPropertyValue('--dark'));
+        thumb.style.setProperty('--light', row.style.getPropertyValue('--light'));
+        thumb.style.backgroundImage = src ? 'url(' + src + ')' : '';
+        thumb.style.backgroundSize = 'cover';
+        thumb.style.backgroundPosition = 'center';
+        thumb.classList.add('on');
+      });
+      row.addEventListener('mouseleave', function () { thumb.classList.remove('on'); });
+      row.addEventListener('mousemove', function (e) {
+        thumb.style.transform = 'translate(' + (e.clientX + 24) + 'px,' + (e.clientY - 68) + 'px)';
+      });
+    });
+  })();
+</script>
