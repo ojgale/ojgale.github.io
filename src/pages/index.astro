@@ -16,7 +16,6 @@ const step = 45; // ms between words
       {rest.map((w, i) => <span class="w" style={`animation-delay:${(words.length + i) * step}ms; font-weight: 400;`}>{w}&nbsp;</span>)}
     </h1>
   </div>
-  <div class="stripe" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
   <section class="wrap" style="padding-top: 56px; padding-bottom: 96px;" aria-labelledby="sel">
     <p class="mono" style="margin: 0 0 40px; max-width: 70ch; text-transform: none; letter-spacing: 0.02em; font-size: 14px;">{site.now}</p>
