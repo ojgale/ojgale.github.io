@@ -56,18 +56,6 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
 .site-head nav a[aria-current="page"] { text-decoration: underline; }
 .site-head nav a:hover, .site-head .name:hover { color: inherit; text-decoration: underline; }
 
-/* Color stripe */
-.stripe { display: flex; height: 18px; }
-.stripe span { flex: 1; transform-origin: left; }
-.stripe span:nth-child(1) { background: var(--cobalt); }
-.stripe span:nth-child(2) { background: var(--marigold); }
-.stripe span:nth-child(3) { background: var(--pink); }
-.stripe span:nth-child(4) { background: var(--ink); }
-.js .stripe span { transform: scaleX(0); transition: transform var(--dur-reveal) var(--ease); }
-.js .stripe.in span { transform: none; }
-.js .stripe.in span:nth-child(2) { transition-delay: 90ms; }
-.js .stripe.in span:nth-child(3) { transition-delay: 180ms; }
-.js .stripe.in span:nth-child(4) { transition-delay: 270ms; }
 
 /* Word-by-word reveal */
 .reveal .w { display: inline-block; opacity: 0; transform: translateY(0.4em); animation: rise var(--dur-reveal) var(--ease) forwards; }
@@ -120,7 +108,7 @@ h1, h2, h3 { font-weight: 600; margin: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal .w { animation: none; opacity: 1; transform: none; }
-  .js .fade, .js .stripe span { opacity: 1; transform: none; transition: none; }
+  .js .fade { opacity: 1; transform: none; transition: none; }
   .row { transition: none; }
   .thumb { display: none; }
 }
