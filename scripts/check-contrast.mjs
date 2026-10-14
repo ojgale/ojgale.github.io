@@ -1,13 +1,10 @@
-// Fails the build if any approved pairing drops below its WCAG level,
-// or if a project uses a ground/accent pair outside the approved matrix.
+// Fails the build if any text/background pair the design uses drops below WCAG 2.2 AA.
+// Small text needs 4.5:1; large text (24px+, or 18.7px+ bold) needs 3:1.
+// Colors come from src/palette.json, the same file the site uses.
 import fs from 'node:fs';
 import path from 'node:path';
-import matter from 'gray-matter';
 
-const HEX = {
-  cobalt: '#2433C2', marigold: '#F5B82E', pink: '#F7A8C9', paper: '#FFFDF8', ink: '#17120F',
-  plum: '#6E1E5A', emerald: '#0B6E4F', tangerine: '#FF7A33',
-};
+const HEX = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, '../src/palette.json'), 'utf8'));
 const lum = (h) => {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
     .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
@@ -15,26 +12,35 @@ const lum = (h) => {
 };
 const ratio = (a, b) => { const [x, y] = [lum(HEX[a]), lum(HEX[b])].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
 
-// [text, ground, minimum]
+const SMALL = 4.5, LARGE = 3;
+// [text, background, minimum, where it's used]
 const PAIRS = [
-  ['paper', 'cobalt', 4.5], ['marigold', 'cobalt', 4.5], ['pink', 'cobalt', 4.5], ['tangerine', 'cobalt', 3],
-  ['ink', 'marigold', 4.5], ['plum', 'marigold', 4.5], ['cobalt', 'marigold', 4.5],
-  ['ink', 'pink', 4.5], ['plum', 'pink', 4.5], ['cobalt', 'pink', 4.5],
-  ['ink', 'paper', 4.5], ['plum', 'paper', 4.5], ['cobalt', 'paper', 4.5], ['emerald', 'paper', 4.5],
-  ['paper', 'ink', 4.5],
+  ['ink', 'paper', SMALL, 'nav, headings, home text'],
+  ['body', 'paper', SMALL, 'long-form paragraphs'],
+  ['muted', 'paper', SMALL, 'photo captions, map and legend labels'],
+  ['oxblood', 'paper', SMALL, 'section numbers, links on hover, pull quotes'],
+  ['ink', 'lilac', SMALL, 'DAN header, stat labels, tiles, footer, Next band'],
+  ['oxblood', 'lilac', SMALL, 'DAN subtitle, stat numbers, footer "Let\'s talk"'],
+  ['ink', 'olive', SMALL, 'SDDW and About headers, guiding-question label, Recognition tile'],
+  ['oxblood', 'olive', LARGE, 'SDDW subtitle (26px italic)'],
+  ['paper', 'olive', LARGE, 'how-might-we question (30px) and "How might we" (44px+)'],
+  ['paper', 'oxblood', SMALL, 'Conference header, tiles, Next band, dark-mode numbers band'],
+  ['lilac', 'oxblood', LARGE, 'Conference subtitle (26px italic)'],
+  ['paper', 'ink', SMALL, 'Why-learn header, numbers band, dark mode text'],
+  ['lilac', 'ink', SMALL, 'Why-learn subtitle, dark-mode accent and link hover'],
+  ['mutedDark', 'ink', SMALL, 'dark-mode muted text'],
+  ['ink', 'stone', SMALL, 'Housing "coming soon" tile'],
+  ['ink', 'warm', SMALL, 'Conference cards'],
+  ['oxblood', 'warm', SMALL, 'Conference card dates'],
+  ['muted', 'map', SMALL, 'DAN flower legend'],
 ];
+
 let bad = 0;
-for (const [t, g, min] of PAIRS) {
+for (const [t, g, min, use] of PAIRS) {
   const r = ratio(t, g);
   const ok = r >= min;
   if (!ok) bad++;
-  console.log(`${ok ? 'ok  ' : 'FAIL'} ${t} on ${g}: ${r.toFixed(2)} (needs ${min})`);
-}
-const allowed = PAIRS.filter((p) => p[2] >= 4.5).map((p) => `${p[0]}/${p[1]}`);
-const dir = path.resolve(import.meta.dirname, '../src/content/projects');
-for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.md'))) {
-  const { data } = matter(fs.readFileSync(path.join(dir, f), 'utf8'));
-  if (!allowed.includes(`${data.accent}/${data.ground}`)) { bad++; console.log(`FAIL ${f}: ${data.accent} on ${data.ground} is not an approved pairing`); }
+  console.log(`${ok ? 'ok  ' : 'FAIL'} ${t} on ${g}: ${r.toFixed(2)} (needs ${min}) · ${use}`);
 }
 if (bad) { console.error(`\n${bad} contrast problem(s).`); process.exit(1); }
-console.log('\nAll pairings pass WCAG 2.2 AA.');
+console.log('\nAll pairs pass WCAG 2.2 AA.');

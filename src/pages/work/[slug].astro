@@ -1,94 +1,65 @@
 ---
-import Base from '../../layouts/Base.astro';
+import { Image } from 'astro:assets';
 import { render } from 'astro:content';
-import { getProjects, url, partnerOf } from '../../lib/projects';
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import * as components from '../../components/content';
+import { getProjects, projectUrl } from '../../lib/projects';
+import { img } from '../../lib/images';
+import { bandStyle, hex, subtitleColor } from '../../lib/colors';
 
 export async function getStaticPaths() {
   const all = await getProjects();
-  return all.map((p, i) => ({ params: { slug: p.id }, props: { p, next: all[(i + 1) % all.length] } }));
+  return all.map((p) => {
+    const next = all.find((q) => q.id === p.data.next);
+    if (!next) throw new Error(`${p.id}: "next: ${p.data.next}" doesn't match any project slug.`);
+    return { params: { slug: p.id }, props: { p, next } };
+  });
 }
 const { p, next } = Astro.props;
 const d = p.data;
 const { Content } = await render(p);
-const meta = [['Role', d.role], ['Partners', d.partners], ['Timeline', d.timeline], ['Methods', d.methods], ['Outcome', d.outcome]];
-const partner = partnerOf[d.ground];
+const facts = [
+  ['Role', d.role], ['Partners', d.partners], ['Dates', d.dates],
+  ['Recognition', d.recognition], ['Methods', d.methods],
+].filter(([, v]) => v);
+const titleLines = d.title.trim().split('\n');
+const heroStyle = [`object-position: ${d.heroPosition}`, d.heroHeight ? `height: ${d.heroHeight}px` : `aspect-ratio: ${d.heroAspect}`].join('; ');
 ---
-<Base title={d.title} description={d.summary} ground={d.ground} current="work">
-  <div slot="hero" class="wrap" data-accent={d.accent} style="padding-top: 32px; padding-bottom: 48px;">
-    <p class="label" style="margin: 0 0 16px;">{d.type} · {d.year}</p>
-    <h1 class="display" style="font-size: clamp(34px, 5vw, 60px); line-height: 1.08; max-width: 22ch;">{d.title}, <span class="pop">{d.phrase}.</span></h1>
-    <dl class="meta label">
-      {meta.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
-    </dl>
-  </div>
-
-  <article class="wrap story" style={`--dark: var(--${d.duotone.dark}); --light: var(--${d.duotone.light}); --partner: var(--${partner});`}>
-    <div class="media">
-      <div class="sticky">
-        {d.images.length ? d.images.map((img, i) => (
-          <figure class:list={['frame', { on: i === 0 }]} data-i={i}>
-            <img src={url(img.src)} alt={img.alt} loading={i === 0 ? 'eager' : 'lazy'} />
-            {img.caption && <figcaption class="mono muted">{img.caption}</figcaption>}
-          </figure>
-        )) : (
-          <figure class="frame on"><div class="texture ph" role="img" aria-label={`Placeholder texture in this project's colors`}></div><figcaption class="mono muted">[Project photos to come]</figcaption></figure>
-        )}
+<Base title={titleLines.join(' ')} description={d.description ?? d.subtitle} ogImage={d.heroImage}>
+  <header class="phead" style={bandStyle(d.headerColor)}>
+    <div class="wrap phead-inner">
+      <Nav current="work" />
+      <div class="phead-row">
+        <div class="phead-text">
+          <span class="label">{d.eyebrow}</span>
+          <h1>{titleLines.map((line, i) => <>{i > 0 && <br />}{line}</>)}</h1>
+          <p class="subtitle" style={`color: ${subtitleColor(d.headerColor)}`}>{d.subtitle}</p>
+        </div>
+        <dl class="facts">
+          {facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+        </dl>
       </div>
     </div>
-    <div class="body">
-      <Content />
-    </div>
-  </article>
+  </header>
 
-  <a class="next" href={url(`/work/${next.id}/`)} data-ground={next.data.ground} data-accent={next.data.accent}>
-    <span class="wrap" style="display:block;">
+  <div style={`--tint: ${hex(d.tint)}`}>
+    <figure class="hero">
+      <div class="photo">
+        <Image src={img(d.heroImage)} alt={d.heroAlt} widths={[800, 1280, 1800]} sizes="100vw" format="webp" quality={72} loading="eager" fetchpriority="high" style={heroStyle} />
+      </div>
+      <figcaption class="cap">{d.heroCaption}</figcaption>
+    </figure>
+
+    <main id="main" class:list={['pmain', { tight: d.tight }]}>
+      <Content components={components} />
+    </main>
+  </div>
+
+  <a class="next" href={projectUrl(next.id)} style={bandStyle(next.data.headerColor)}>
+    <span class="wrap next-inner">
       <span class="label">Next project</span>
-      <span class="display" style="display:block; font-size: clamp(30px, 4.4vw, 52px); line-height: 1.1; margin-top: 12px;">{next.data.title}, <span class="pop">{next.data.phrase}.</span> &rarr;</span>
+      <span class="next-title">{next.data.shortTitle ?? next.data.title.replace(/\s*\n\s*/g, ' ')}, <em>{next.data.tagline}</em> →</span>
     </span>
   </a>
-
-  <script is:inline>
-    (function () {
-      var frames = document.querySelectorAll('.frame[data-i]');
-      var chapters = document.querySelectorAll('.story .chapter');
-      if (frames.length < 2 || !('IntersectionObserver' in window)) return;
-      var io = new IntersectionObserver(function (es) {
-        es.forEach(function (e) {
-          if (!e.isIntersecting) return;
-          var i = Math.min(Number(e.target.getAttribute('data-chapter')), frames.length - 1);
-          frames.forEach(function (f, j) { f.classList.toggle('on', j === i); });
-        });
-      }, { rootMargin: '-45% 0px -50% 0px' });
-      chapters.forEach(function (c) { io.observe(c); });
-    })();
-  </script>
 </Base>
-
-<style>
-  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px 20px; margin: 32px 0 0; padding-top: 16px; border-top: 1px solid var(--line); }
-  .meta dt { opacity: 1; }
-  .meta dd { margin: 4px 0 0; font-weight: 500; text-transform: none; letter-spacing: 0.02em; font-size: 13px; }
-  .story { display: flex; flex-wrap: wrap; gap: 48px; padding-top: 64px; padding-bottom: 96px; }
-  .media { flex: 1 1 320px; min-width: 0; }
-  .sticky { position: sticky; top: 96px; display: grid; }
-  .frame { grid-area: 1 / 1; margin: 0; opacity: 0; transition: opacity 300ms linear; }
-  .frame.on { opacity: 1; }
-  .frame img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
-  .frame figcaption { margin-top: 8px; font-size: 12px; }
-  .ph { aspect-ratio: 4 / 3; }
-  .body { flex: 1.3 1 380px; min-width: 0; max-width: var(--measure); counter-reset: ch; }
-  .body :global(.chapter) { padding-bottom: 28px; margin-bottom: 28px; border-bottom: 1px solid var(--rule); }
-  .body :global(h2) { counter-increment: ch; font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--plum); margin-bottom: 10px; }
-  .body :global(h2)::before { content: counter(ch, decimal-leading-zero) " · "; }
-  .body :global(p), .body :global(ul) { margin: 0 0 14px; }
-  .body :global(ul) { padding-left: 20px; }
-  .body :global(blockquote) { margin: 20px 0 0; padding: 20px; background: var(--partner); color: var(--ink); font-size: 26px; line-height: 1.25; font-style: italic; }
-  .body :global(blockquote p) { margin: 0; }
-  .next { display: block; padding: 56px 0 72px; text-decoration: none; }
-  .next:hover { color: inherit; }
-  .next:hover .display { text-decoration: underline; text-decoration-thickness: 2px; }
-  @media (max-width: 760px) {
-    .sticky { position: static; }
-  }
-  @media (prefers-reduced-motion: reduce) { .frame { transition: none; } }
-</style>

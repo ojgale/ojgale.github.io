@@ -1,0 +1,16 @@
+---
+interface Props {
+  /** Narrowest a photo gets before the row wraps (px). */
+  min?: number;
+  /** Space between rows when the grid wraps (px). */
+  rowGap?: number;
+  /** Alternate captions: 1st, 3rd, 5th... above the photo. */
+  alternate?: boolean;
+  /** Used by the section layout only: keep this row inside the section above it. */
+  inSection?: boolean;
+}
+const { min = 240, rowGap = 12, alternate = false } = Astro.props;
+---
+<div class:list={['photo-row', { alternate }]} style={`--min: ${min}px; --gap: ${rowGap}px 12px;`}>
+  <slot />
+</div>

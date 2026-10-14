@@ -1,0 +1,25 @@
+---
+import site from '../site.config.json';
+import { url } from '../lib/projects';
+
+interface Props {
+  /** Which link is underlined: "work" on project pages, "about" on About. */
+  current?: 'home' | 'work' | 'about';
+  /** Home page only: Contact link and the dark mode toggle. */
+  home?: boolean;
+}
+const { current = 'home', home = false } = Astro.props;
+---
+<nav aria-label="Main" class="nav label">
+  <a href={url('/')}>{site.name}</a>
+  <span class="nav-links">
+    <a href={url('/#work')} class:list={{ current: current === 'work' }}>Work</a>
+    <a href={url('/about/')} aria-current={current === 'about' ? 'page' : undefined}>About</a>
+    {home && <a href="#contact">Contact</a>}
+    {home && (
+      <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Dark mode" data-theme-toggle>
+        <span class="knob" aria-hidden="true"></span><span data-theme-label>Light</span>
+      </button>
+    )}
+  </span>
+</nav>

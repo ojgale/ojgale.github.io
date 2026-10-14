@@ -1,0 +1,24 @@
+---
+import site from '../site.config.json';
+---
+<footer id="contact" class="contact">
+  <div class="wrap contact-inner">
+    <p class="contact-line">Working on something public?<br><em>Let's talk.</em></p>
+    <span class="contact-links label">
+      <a href={`mailto:${site.email}`}>Email</a>
+      <a href={site.linkedin}>LinkedIn</a>
+      <a href={site.resume} target="_blank" rel="noopener">Resume</a>
+    </span>
+  </div>
+</footer>
+
+<style>
+  .contact { background: var(--lilac); color: var(--ink); }
+  .contact-inner { padding-top: 56px; padding-bottom: 56px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; }
+  .contact-line { margin: 0; font-size: clamp(30px, 4vw, 48px); line-height: 1.1; letter-spacing: -0.02em; }
+  .contact-line em { color: var(--oxblood); }
+  .contact-links { display: flex; gap: 24px; }
+  .contact .contact-links a { color: var(--ink); }
+  .contact .contact-links a:hover { color: var(--oxblood); }
+  .contact .contact-links a:focus-visible { outline-color: var(--ink); }
+</style>

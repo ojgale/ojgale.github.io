@@ -1,28 +1,21 @@
 ---
-title: "About"
-phrase: "an assembler"
+title: "Olivia Gale,"
+phrase: "an assembler."
+eyebrow: "Civic designer. Human-centered methods, public outcomes."
+intro: "I bring public institutions, private partners and communities into valuable working collaborations, and design the systems that keep them running."
+description: "Olivia Gale is a civic designer in San Diego. She brings public institutions, private partners and communities into working collaborations, and designs the systems that keep them running."
+portrait: about-portrait.jpg
+portraitAlt: "Olivia Gale at an event, smiling with her hand at her chin"
+portraitPosition: "41% 30%"
+focusAreas: ["Civic design", "Housing", "Workforce", "Culture", "Higher education"]
 ---
 
-I bring public institutions, private partners and communities into working collaborations, and I build the systems that keep them running.
+<mark>I'm an aspiring civic designer, and my superpower is *assembling*.</mark>
 
-I've managed a binational legacy program for World Design Capital San Diego Tijuana 2024, co-led an international design policy conference, and launched programs inside a public university. I'm drawn to the systems that deliver to people: housing, workforce, culture and welfare, and the economy underneath them. Next, I want to learn how policy and public finance shape what those collaborations can do.
+I studied cognitive science (design and interaction) at UC San Diego and freelanced after graduating in 2022. In 2023 I joined World Design Capital San Diego Tijuana 2024 to run the Design to Action Networks: six binational networks and 63 community projects, recognized with the **2024 Don Norman Design Award**. Now I'm at the Design Lab, building projects with outside partners and helping the Lab become a place that teaches design.
 
-## Focus areas
+The part I like most is early on, when a group shares a problem but not a plan yet: the site visits, the first conversations, hearing what people already know. Then I work out the unglamorous pieces that keep them going together, like an intake form, a budget or a guide for the next meeting. Lately I've loved having more room for writing and research, and I'm looking for my next place to learn and grow that side of the work.
 
-- Civic design and public-private collaboration
-- Housing, workforce and cultural systems
-- Higher education and what it certifies
+I also say yes to a lot. Knowing when to stop is a skill I'm still practicing, and lately a question I'm asking about design education too.
 
-## How I work
-
-Human-centered research, service design and facilitation. I start by listening, build structure people can lean on, and keep it flexible enough to hold local context.
-
-## Background
-
-- Lead Program Manager, UC San Diego Design Lab
-- Community Program Manager, World Design Capital San Diego Tijuana 2024
-- Ex officio board seat on behalf of the Design Lab
-- B.S. Cognitive Science, Design & Interaction, UC San Diego
-- Recognition: Don Norman Design Award (Design to Action Networks); Fast Company "Small but Mighty" (World Design Capital team)
-
-[CV link]
+I live in San Diego. When I'm not designing, I'm probably skiing.

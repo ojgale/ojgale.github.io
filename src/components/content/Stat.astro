@@ -1,0 +1,8 @@
+---
+interface Props { n: string }
+const { n } = Astro.props;
+---
+<div class="stat">
+  <span class="stat-n"><b>{n}</b></span>
+  <span class="stat-label"><slot /></span>
+</div>

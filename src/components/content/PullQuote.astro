@@ -1,0 +1,13 @@
+---
+interface Props {
+  /** Who said it, e.g. "James K. White, Head of Studios, UC San Diego Design Lab" */
+  by: string;
+  /** Where it was published (shown in italics). */
+  source?: string;
+}
+const { by, source } = Astro.props;
+---
+<figure class="pull">
+  <blockquote><slot /></blockquote>
+  <figcaption>{by}{source && <> · <em>{source}</em></>}</figcaption>
+</figure>

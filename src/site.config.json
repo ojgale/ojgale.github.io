@@ -1,9 +1,24 @@
 {
   "name": "Olivia Gale",
-  "statement": "I'm interested in what people know that",
-  "statementPop": "systems don't,",
-  "statementRest": "and how to get that knowledge into the places that serve them.",
-  "now": "Now: Lead Program Manager at the UC San Diego Design Lab, running a housing design-a-thon with NewSchool of Architecture and Design.",
+  "description": "Olivia Gale is a civic designer in San Diego who brings public institutions, private partners and communities into working collaborations.",
+  "ogImage": "dan-site-visit-hill.jpg",
+
+  "eyebrow": "Civic designer. Human-centered methods, public outcomes.",
+  "positioning": "I bring public institutions, private partners and communities into working collaborations, built on what people know that",
+  "positioningPop": "systems don't.",
+
+  "numbers": [
+    { "n": "3,700+", "label": "people reached through programs and events" },
+    { "n": "400+", "label": "civic, design and industry leaders engaged" },
+    { "n": "160+", "label": "convenings, workshops and events" },
+    { "n": "3,600+", "label": "hours of design support for public projects" }
+  ],
+
+  "comingSoon": [
+    { "title": "Housing Design-a-thon", "image": "housing-designathon.jpg", "position": "center" }
+  ],
+
   "email": "ojgaledesigns@gmail.com",
-  "linkedin": "https://www.linkedin.com/in/oliviajgale"
+  "linkedin": "https://www.linkedin.com/in/oliviajgale",
+  "resume": "https://drive.google.com/file/d/1722oxOGhjsyNumGE26PfF-IcE552Wh3X/view?usp=sharing"
 }

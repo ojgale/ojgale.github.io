@@ -6,6 +6,4 @@ export async function getProjects() {
 }
 
 export const url = (path: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${path}`;
-
-// The bright partner that pull quotes sit on, per ground.
-export const partnerOf = { cobalt: 'marigold', marigold: 'pink', pink: 'marigold' } as const;
+export const projectUrl = (slug: string) => url(`/work/${slug}/`);

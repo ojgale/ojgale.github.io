@@ -1,0 +1,9 @@
+---
+interface Props { date: string; title: string }
+const { date, title } = Astro.props;
+---
+<article class="card">
+  <span class="label">{date}</span>
+  <h3>{title}</h3>
+  <div class="card-body"><slot /></div>
+</article>

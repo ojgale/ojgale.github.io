@@ -1,0 +1,40 @@
+---
+import { Image } from 'astro:assets';
+import { img } from '../../lib/images';
+
+interface Props {
+  /** File name in src/assets/images/ */
+  src: string;
+  alt: string;
+  caption?: string;
+  /** Crop height in px (default: the photo's own shape). */
+  height?: number;
+  /** Crop shape instead of a fixed height, e.g. "3 / 2". */
+  aspect?: string;
+  /** Which part of the photo stays in frame, e.g. "center 30%". */
+  position?: string;
+  /** Put the caption above the photo. */
+  captionTop?: boolean;
+  /** Limit the width, e.g. 600 for a smaller inline photo. */
+  maxWidth?: number;
+  /** Used by the section layout only: keep this photo inside the section above it. */
+  inSection?: boolean;
+  /** Set automatically for photos in a <PhotoRow>: how many share the row. */
+  inRow?: number;
+}
+const { src, alt, caption, height, aspect, position, captionTop = false, maxWidth, inRow } = Astro.props;
+const imgStyle = [
+  height ? `height: ${height}px` : '',
+  aspect ? `aspect-ratio: ${aspect}` : '',
+  position ? `object-position: ${position}` : '',
+].filter(Boolean).join('; ');
+const sizes = inRow
+  ? `(max-width: 760px) 100vw, ${Math.ceil(1100 / Math.min(inRow, 4))}px`
+  : maxWidth ? `(max-width: ${maxWidth}px) 100vw, ${maxWidth}px` : '(max-width: 1160px) 100vw, 1100px';
+---
+<figure class:list={['fig', { top: captionTop }]} style={maxWidth ? `width: 100%; max-width: ${maxWidth}px;` : undefined}>
+  <div class="photo">
+    <Image src={img(src)} alt={alt} widths={[480, 800, 1200]} sizes={sizes} format="webp" quality={72} style={imgStyle || undefined} />
+  </div>
+  {caption && <figcaption class="cap">{caption}</figcaption>}
+</figure>

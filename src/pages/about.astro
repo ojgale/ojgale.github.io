@@ -1,27 +1,73 @@
 ---
-import Base from '../layouts/Base.astro';
+import { Image } from 'astro:assets';
 import { getEntry, render } from 'astro:content';
-import { url } from '../lib/projects';
-const page = await getEntry('pages', 'about');
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import { img } from '../lib/images';
+import site from '../site.config.json';
+
+const page = (await getEntry('pages', 'about'))!;
+const d = page.data;
 const { Content } = await render(page);
 ---
-<Base title="About" ground="marigold" current="about">
-  <div slot="hero" class="wrap" style="padding-top: 40px; padding-bottom: 64px;">
-    <h1 class="display" style="font-size: clamp(40px, 6vw, 72px);">Olivia Gale, <span class="pop">{page.data.phrase}.</span></h1>
-  </div>
-  <section class="wrap about" style="padding-top: 64px; padding-bottom: 96px;">
-    <figure class="portrait">
-      <img src={url('/images/portrait.jpg')} alt="Olivia Gale, standing outdoors in a red jacket" width="900" height="1350" />
-    </figure>
-    <div class="prose"><Content /></div>
-  </section>
+<Base title="About" description={d.description} ogImage={d.portrait}>
+  <header class="about-head">
+    <div class="wrap about-head-inner">
+      <Nav current="about" />
+      <div class="about-head-row">
+        <div class="about-head-text">
+          <span class="label">{d.eyebrow}</span>
+          <h1>{d.title} <em>{d.phrase}</em></h1>
+          <p>{d.intro}</p>
+        </div>
+        <div class="photo about-portrait" style="--tint: var(--lilac)">
+          <Image src={img(d.portrait!)} alt={d.portraitAlt!} widths={[300, 600, 900]} sizes="300px" format="webp" quality={75} loading="eager" style={`object-position: ${d.portraitPosition}`} />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section aria-labelledby="me" class="wrap about-me">
+      <h2 id="me">About me</h2>
+      <div class="about-body"><Content /></div>
+    </section>
+
+    <section aria-label="Focus areas" class="wrap focus">
+      <span class="label">Focus areas</span>
+      <span class="focus-list">{d.focusAreas?.join(' · ')}</span>
+      <a class="label" href={site.resume} target="_blank" rel="noopener">Resume (PDF) ↗</a>
+    </section>
+  </main>
 </Base>
+
 <style>
-  .about { display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start; }
-  .portrait { flex: 0 1 320px; margin: 0; }
-  .portrait img { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; }
-  .prose { flex: 1 1 420px; min-width: 0; max-width: var(--measure); }
-  .prose :global(p:first-child) { font-size: clamp(22px, 2.4vw, 28px); line-height: 1.35; font-weight: 500; margin-top: 0; }
-  .prose :global(h2) { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--plum); margin: 36px 0 10px; padding-top: 16px; border-top: 1px solid var(--rule); }
-  .prose :global(ul) { padding-left: 20px; margin: 0; }
+  .about-head { background: var(--olive); color: var(--ink); }
+  .about-head-inner { padding-top: 28px; display: flex; flex-direction: column; gap: 40px; }
+  .about-head-row { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-end; }
+  .about-head-text { flex: 999 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 20px; padding-bottom: 56px; }
+  h1 { margin: 0; font-size: clamp(40px, 6vw, 80px); line-height: 1.04; letter-spacing: -0.02em; font-weight: 400; }
+  h1 em { color: var(--lilac); background: var(--ink); padding: 0 0.12em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .about-head-text p { margin: 0; font-size: 22px; line-height: 1.45; max-width: 34ch; }
+  .about-portrait { flex: 0 1 300px; }
+  .about-portrait :global(img) { width: 300px; max-width: 100%; height: 380px; }
+
+  .about-me { padding-top: 80px; padding-bottom: 56px; display: flex; flex-wrap: wrap; gap: 24px 48px; }
+  h2 { flex: 0 0 220px; margin: 0; font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--oxblood); }
+  .about-body { flex: 1 1 560px; min-width: 0; max-width: 720px; display: flex; flex-direction: column; gap: 24px; }
+  .about-body :global(p) { margin: 0; font-size: 20px; line-height: 1.65; color: var(--body); }
+  .about-body :global(p:first-child) { font-size: 32px; line-height: 1.45; color: var(--ink); }
+  .about-body :global(mark) { background: var(--lilac); color: inherit; padding: 2px 6px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .about-body :global(mark em) { color: var(--oxblood); }
+  .about-body :global(strong) { background: var(--lilac); color: var(--ink); padding: 1px 6px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+
+  .focus { padding-top: 16px; padding-bottom: 96px; display: flex; flex-wrap: wrap; gap: 12px 32px; align-items: baseline; }
+  .focus > .label:first-child { color: var(--oxblood); }
+  .focus-list { font-size: 26px; line-height: 1.3; }
+  .focus a { margin-left: auto; color: var(--ink); }
+  .focus a:hover, .about-body :global(a:hover) { color: var(--oxblood); }
+  @media (max-width: 600px) {
+    .about-body :global(p:first-child) { font-size: 26px; }
+    .focus a { margin-left: 0; }
+  }
 </style>

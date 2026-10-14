@@ -1,26 +1,177 @@
 ---
+import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import WorkRows from '../components/WorkRows.astro';
-import { getProjects, url } from '../lib/projects';
+import Nav from '../components/Nav.astro';
+import ContactFooter from '../components/ContactFooter.astro';
+import { getProjects, projectUrl } from '../lib/projects';
+import { img } from '../lib/images';
+import { bandStyle } from '../lib/colors';
 import site from '../site.config.json';
 
+// The first tile is the big one (4 of 6 columns); the second shares its row.
 const projects = (await getProjects()).filter((p) => p.data.featured);
-const words = `${site.statement}`.split(' ');
-const rest = site.statementRest.split(' ');
-const step = 45; // ms between words
+const tiles = [
+  ...projects.map((p) => ({
+    title: p.data.shortTitle ?? p.data.title.replace(/\s*\n\s*/g, ' '),
+    href: projectUrl(p.id),
+    color: p.data.tileColor,
+    image: p.data.tileImage ?? p.data.heroImage,
+    position: p.data.tilePosition,
+  })),
+  ...site.comingSoon.map((c) => ({ title: c.title, href: undefined, color: 'stone' as const, image: c.image, position: c.position })),
+];
+const withStamps = await Promise.all(tiles.map(async (t) => ({
+  ...t,
+  stamp: (await getImage({ src: img(t.image), width: 224, format: 'webp', quality: 60 })).src,
+})));
 ---
-<Base rotateLead current="home">
-  <div slot="hero" class="wrap" style="padding-top: 56px; padding-bottom: 88px;">
-    <h1 class="display reveal" style="font-size: clamp(34px, 5.2vw, 64px); line-height: 1.08; letter-spacing: -0.015em; max-width: 24ch;">
-      {words.map((w, i) => <span class="w" style={`animation-delay:${i * step}ms`}>{w}&nbsp;</span>)}<span class="w pop" style={`animation-delay:${(words.length + rest.length) * step}ms`}>{site.statementPop}</span>{' '}
-      {rest.map((w, i) => <span class="w" style={`animation-delay:${(words.length + i) * step}ms; font-weight: 400;`}>{w}&nbsp;</span>)}
-    </h1>
-  </div>
+<Base themeable>
+  <div class="home">
+    <div class="wrap home-top">
+      <Nav home />
+    </div>
 
-  <section class="wrap" style="padding-top: 56px; padding-bottom: 96px;" aria-labelledby="sel">
-    <p class="mono" style="margin: 0 0 40px; max-width: 70ch; text-transform: none; letter-spacing: 0.02em; font-size: 14px;">{site.now}</p>
-    <h2 id="sel" class="label muted" style="padding-bottom: 10px;">Selected work</h2>
-    <WorkRows projects={projects} />
-    <p class="mono" style="margin-top: 24px;"><a href={url('/work/')}>All work &rarr;</a></p>
-  </section>
+    <main id="main">
+      <section aria-label="Introduction" class="wrap intro">
+        <h1>Olivia <em>Gale</em></h1>
+        <div class="intro-text">
+          <span class="label">{site.eyebrow}</span>
+          <p>{site.positioning} <em>{site.positioningPop}</em></p>
+        </div>
+      </section>
+
+      <section id="work" aria-label="Selected work" class="wrap tiles" data-trail>
+        {withStamps.map((t, i) => {
+          const Tag = t.href ? 'a' : 'div';
+          return (
+            <Tag
+              href={t.href}
+              class:list={['tile', { big: i === 0, tall: i < 2, soon: !t.href }]}
+              style={bandStyle(t.color)}
+              data-stamp={t.stamp}
+              role={t.href ? undefined : 'link'}
+              aria-disabled={t.href ? undefined : 'true'}
+            >
+              <Image class="tile-img" src={img(t.image)} alt="" aria-hidden="true" widths={[400, 800, 1200]} sizes={i === 0 ? '(max-width: 760px) 100vw, 730px' : '(max-width: 760px) 100vw, 360px'} format="webp" quality={65} loading={i < 2 ? 'eager' : 'lazy'} style={`object-position: ${t.position}`} />
+              <div class="grain tile-grain" aria-hidden="true"></div>
+              <div class="tile-content">
+                {!t.href && <span class="badge">Coming soon</span>}
+                <span class="tile-title" style={bandStyle(t.color)}>{t.title}</span>
+              </div>
+            </Tag>
+          );
+        })}
+        <div class="trail" aria-hidden="true"></div>
+      </section>
+
+      <section aria-label="By the numbers" class="numbers">
+        <div class="wrap numbers-grid">
+          {site.numbers.map((x) => (
+            <div class="number"><span class="number-n"><b>{x.n}</b></span><span class="label">{x.label}</span></div>
+          ))}
+        </div>
+      </section>
+    </main>
+
+    <ContactFooter />
+  </div>
 </Base>
+
+<script>
+  // Dark mode toggle: swaps the CSS variables on <html data-theme>, remembered per browser.
+  const root = document.documentElement;
+  const btn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const label = btn?.querySelector('[data-theme-label]');
+  const sync = () => {
+    const dark = root.dataset.theme === 'dark';
+    btn?.setAttribute('aria-pressed', String(dark));
+    if (label) label.textContent = dark ? 'Dark' : 'Light';
+  };
+  sync();
+  btn?.addEventListener('click', () => {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('theme', root.dataset.theme); } catch {}
+    sync();
+  });
+
+  // Cursor trail: up to 7 small stamps of the hovered tile's photo follow the mouse.
+  const grid = document.querySelector<HTMLElement>('[data-trail]');
+  const layer = grid?.querySelector<HTMLElement>('.trail');
+  const canTrail = matchMedia('(hover: hover) and (pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (grid && layer && canTrail) {
+    const MAX = 7, SPACING = 56;
+    let pts: { x: number; y: number; img: string }[] = [];
+    const draw = () => {
+      layer.replaceChildren(...pts.map((p, i) => {
+        const age = pts.length - 1 - i;
+        const s = document.createElement('span');
+        s.className = 'stamp';
+        s.style.backgroundImage = `url(${p.img})`;
+        s.style.opacity = String(Math.max(0, 1 - age * 0.15));
+        s.style.transform = `translate(${p.x - 56}px, ${p.y - 40}px) scale(${1 - age * 0.12}) rotate(${i % 2 ? 3 : -3}deg)`;
+        return s;
+      }));
+    };
+    grid.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const tile = (e.target as HTMLElement).closest<HTMLElement>('.tile');
+      if (!tile?.dataset.stamp) return;
+      const r = grid.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const last = pts[pts.length - 1];
+      if (last && Math.abs(last.x - x) + Math.abs(last.y - y) <= SPACING) return;
+      pts = [...pts, { x, y, img: tile.dataset.stamp }].slice(-MAX);
+      draw();
+    });
+    grid.addEventListener('pointerleave', () => { pts = []; draw(); });
+  }
+</script>
+
+<style is:global>
+  .home { --bg: var(--paper); --fg: var(--ink); --accent: var(--oxblood); --muted-c: var(--muted); --band: var(--ink);
+    background: var(--bg); color: var(--fg); min-height: 100vh; transition: background-color 300ms, color 300ms; }
+  html[data-theme="dark"] body { background: var(--ink); }
+  html[data-theme="dark"] .home { --bg: var(--ink); --fg: var(--paper); --accent: var(--lilac); --muted-c: #B5ADA5; --band: var(--oxblood); }
+  .home a { color: var(--fg); }
+  .home a:hover { color: var(--accent); }
+
+  .home-top { padding-top: 28px; }
+  .theme-toggle { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin: -6px 0; padding: 6px 10px; border: 1px solid var(--fg); border-radius: 999px; }
+  .theme-toggle:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .theme-toggle .knob { width: 10px; height: 10px; border-radius: 5px; border: 1px solid currentColor; }
+  .theme-toggle[aria-pressed="true"] .knob { background: currentColor; }
+
+  .intro { padding-top: 64px; padding-bottom: 56px; display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-end; }
+  .intro h1 { flex: 999 1 560px; min-width: 0; margin: 0; font-size: clamp(72px, 13vw, 176px); line-height: 0.9; letter-spacing: -0.03em; font-weight: 400; }
+  .intro h1 em, .intro p em { color: var(--accent); font-weight: 400; }
+  .intro-text { flex: 1 1 280px; display: flex; flex-direction: column; gap: 14px; padding-bottom: 14px; }
+  .intro-text p { margin: 0; font-size: 20px; line-height: 1.4; }
+
+  .tiles { position: relative; padding-bottom: 72px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+  .tile { grid-column: span 2; min-height: 280px; position: relative; overflow: hidden; padding: 24px; text-decoration: none; }
+  .tile.big { grid-column: span 4; }
+  .tile.tall { min-height: 360px; }
+  .tile-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.15); mix-blend-mode: luminosity; transition: opacity 300ms; }
+  .tile-grain { transition: opacity 300ms; }
+  .tile:hover .tile-img, .tile:focus-visible .tile-img { opacity: 0; }
+  .tile:hover .tile-grain, .tile:focus-visible .tile-grain { opacity: 0.45; }
+  .home .tile:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .tile-content { position: relative; display: flex; flex-direction: column; height: 100%; gap: 24px; }
+  .badge { font-family: var(--mono); font-size: 20px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; align-self: flex-start; padding: 8px 14px; background: var(--paper); color: var(--ink); }
+  .tile-title { margin-top: auto; font-size: 26px; line-height: 1.1; letter-spacing: -0.01em; max-width: 16ch; align-self: flex-start; padding: 4px 8px; }
+  .tile.big .tile-title { font-size: 44px; }
+  .home a.tile:hover { color: inherit; }
+  .trail { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+  .stamp { position: absolute; left: 0; top: 0; width: 112px; height: 80px; background: center / cover; filter: grayscale(1) contrast(1.1); mix-blend-mode: multiply; }
+  @media (max-width: 760px) {
+    .tiles { grid-template-columns: 1fr; }
+    .tile, .tile.big { grid-column: auto; }
+    .tile.big .tile-title { font-size: 36px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .home, .tile-img, .tile-grain { transition: none; } }
+
+  .numbers { background: var(--band); color: var(--paper); transition: background-color 300ms; }
+  .numbers-grid { padding-top: 48px; padding-bottom: 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+  .number { display: flex; flex-direction: column; gap: 6px; }
+  .number-n { font-size: 64px; line-height: 1; }
+</style>

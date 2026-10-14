@@ -1,0 +1,9 @@
+---
+interface Props { question: string }
+const { question } = Astro.props;
+---
+<div class="hmw">
+  <span class="label">Guiding question</span>
+  <span class="hmw-big">How might we</span>
+  <p>{question}</p>
+</div>
