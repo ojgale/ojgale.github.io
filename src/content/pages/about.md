@@ -4,9 +4,9 @@ phrase: "an assembler."
 eyebrow: "Civic designer. Human-centered methods, public outcomes."
 intro: "I bring public institutions, private partners and communities into valuable working collaborations, and design the systems that keep them running."
 description: "Olivia Gale is a civic designer in San Diego. She brings public institutions, private partners and communities into working collaborations, and designs the systems that keep them running."
-portrait: about-portrait.jpg
-portraitAlt: "Olivia Gale at an event, smiling with her hand at her chin"
-portraitPosition: "41% 30%"
+portrait: about-portrait-red.jpg
+portraitAlt: "Olivia Gale in a red jacket outside a glass-fronted campus building"
+portraitPosition: "47% 30%"
 focusAreas: ["Civic design", "Housing", "Workforce", "Culture", "Higher education"]
 ---
 

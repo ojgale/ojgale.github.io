@@ -1,0 +1,26 @@
+---
+import site from '../site.config.json';
+---
+<footer id="contact" class="site-footer">
+  <div class="wrap footer-inner">
+    <p class="footer-line">Working on something public?<br><em>Let's talk.</em></p>
+    <span class="footer-links label">
+      <a href={`mailto:${site.email}`}>Email</a>
+      <a href={site.linkedin}>LinkedIn</a>
+      <a href={site.resume} target="_blank" rel="noopener">Resume</a>
+    </span>
+  </div>
+</footer>
+
+<style>
+  /* The hairline keeps the footer distinct from a "Next project" band of the same color. */
+  .site-footer { background: var(--footer-bg); color: var(--footer-fg); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--footer-fg) 22%, transparent); transition: background-color 300ms, color 300ms; }
+  .footer-inner { padding-top: 56px; padding-bottom: 56px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; }
+  .footer-line { margin: 0; font-size: clamp(30px, 4vw, 48px); line-height: 1.1; letter-spacing: -0.02em; }
+  .footer-line em { color: var(--footer-accent); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: var(--footer-fg); }
+  .footer-links a:hover { color: var(--footer-accent); }
+  .footer-links a:focus-visible { outline-color: var(--footer-fg); }
+  @media (prefers-reduced-motion: reduce) { .site-footer { transition: none; } }
+</style>

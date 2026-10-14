@@ -1,18 +1,15 @@
 ---
 import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
 import { url } from '../lib/projects';
 ---
 <Base title="Not found">
-  <header class="phead" style="background: var(--lilac); color: var(--ink);">
+  <section class="phead band" data-band="lilac" aria-label="Page not found">
     <div class="wrap phead-inner">
-      <Nav />
       <div class="phead-text">
         <span class="label">404</span>
         <h1>This page isn't here.</h1>
-        <p class="subtitle" style="color: var(--oxblood);">Try the <a href={url('/')}>home page</a> or the <a href={url('/#work')}>work</a>.</p>
+        <p class="subtitle">Try the <a href={url('/')}>home page</a> or the <a href={url('/#work')}>work</a>.</p>
       </div>
     </div>
-  </header>
-  <main id="main"></main>
+  </section>
 </Base>

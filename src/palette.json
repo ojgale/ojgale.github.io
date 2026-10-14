@@ -9,5 +9,12 @@
   "stone": "#A8A29C",
   "warm": "#F4EFE6",
   "map": "#EFE7D8",
-  "mutedDark": "#B5ADA5"
+
+  "bodyDark": "#E9E3DA",
+  "mutedDark": "#B5ADA5",
+  "inkRaised": "#2A2420",
+  "lilacDeep": "#2B2A5C",
+  "oliveDeep": "#3A3C12",
+  "oliveLight": "#D4D88A",
+  "stoneDeep": "#4A4541"
 }

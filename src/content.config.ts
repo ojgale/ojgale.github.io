@@ -1,6 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { BANDS } from './lib/colors';
+import { BANDS, TINTS } from './lib/colors';
 
 const band = z.enum(BANDS);
 
@@ -21,7 +21,7 @@ const projects = defineCollection({
 
     headerColor: band,
     tileColor: band,
-    tint: z.enum(['lilac', 'oxblood', 'olive']), // color behind every photo on the page
+    tint: z.enum(TINTS), // color behind every photo on the page
     tileImage: z.string().optional(), // defaults to heroImage
     tilePosition: z.string().default('center'),
 

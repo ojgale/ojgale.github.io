@@ -2,11 +2,9 @@
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import Nav from '../../components/Nav.astro';
 import * as components from '../../components/content';
 import { getProjects, projectUrl } from '../../lib/projects';
 import { img } from '../../lib/images';
-import { bandStyle, hex, subtitleColor } from '../../lib/colors';
 
 export async function getStaticPaths() {
   const all = await getProjects();
@@ -26,24 +24,23 @@ const facts = [
 const titleLines = d.title.trim().split('\n');
 const heroStyle = [`object-position: ${d.heroPosition}`, d.heroHeight ? `height: ${d.heroHeight}px` : `aspect-ratio: ${d.heroAspect}`].join('; ');
 ---
-<Base title={titleLines.join(' ')} description={d.description ?? d.subtitle} ogImage={d.heroImage}>
-  <header class="phead" style={bandStyle(d.headerColor)}>
+<Base title={titleLines.join(' ')} description={d.description ?? d.subtitle} ogImage={d.heroImage} current="work">
+  <section class="phead band" data-band={d.headerColor} aria-label="Project summary">
     <div class="wrap phead-inner">
-      <Nav current="work" />
       <div class="phead-row">
         <div class="phead-text">
           <span class="label">{d.eyebrow}</span>
           <h1>{titleLines.map((line, i) => <>{i > 0 && <br />}{line}</>)}</h1>
-          <p class="subtitle" style={`color: ${subtitleColor(d.headerColor)}`}>{d.subtitle}</p>
+          <p class="subtitle">{d.subtitle}</p>
         </div>
         <dl class="facts">
           {facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
         </dl>
       </div>
     </div>
-  </header>
+  </section>
 
-  <div style={`--tint: ${hex(d.tint)}`}>
+  <div data-tint={d.tint}>
     <figure class="hero">
       <div class="photo">
         <Image src={img(d.heroImage)} alt={d.heroAlt} widths={[800, 1280, 1800]} sizes="100vw" format="webp" quality={72} loading="eager" fetchpriority="high" style={heroStyle} />
@@ -51,12 +48,12 @@ const heroStyle = [`object-position: ${d.heroPosition}`, d.heroHeight ? `height:
       <figcaption class="cap">{d.heroCaption}</figcaption>
     </figure>
 
-    <main id="main" class:list={['pmain', { tight: d.tight }]}>
+    <div class:list={['pmain', { tight: d.tight }]}>
       <Content components={components} />
-    </main>
+    </div>
   </div>
 
-  <a class="next" href={projectUrl(next.id)} style={bandStyle(next.data.headerColor)}>
+  <a class="next band" href={projectUrl(next.id)} data-band={next.data.headerColor}>
     <span class="wrap next-inner">
       <span class="label">Next project</span>
       <span class="next-title">{next.data.shortTitle ?? next.data.title.replace(/\s*\n\s*/g, ' ')}, <em>{next.data.tagline}</em> →</span>

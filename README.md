@@ -73,6 +73,18 @@ The DAN page's flower model and map are fixed graphics in `src/components/dan/`.
 `tileColor`, `tileImage` or the hero photo). The Housing Design-a-thon tile lives under `comingSoon`
 and doesn't link anywhere until it gets a page.
 
+## Header, footer and dark mode
+
+Every page gets the same header (`src/components/Header.astro`: name, Work, About, Contact and the
+Light/Dark toggle) and the same "Let's talk" footer (`src/components/Footer.astro`) from
+`src/layouts/Base.astro`. The toggle remembers each visitor's choice; until they pick one, the site
+follows their device's light or dark setting.
+
+Colors are set once in `src/styles/global.css`, in a light and a dark version: page colors at the top,
+then the `data-band` colors (project headers, home tiles, "Next project") and the `data-tint` photo
+colors. `npm run build` checks every text and background pair in both themes, so if you change a color,
+update `src/palette.json` and the pair list in `scripts/check-contrast.mjs` too.
+
 ## Photos
 
 Put new photos in `src/assets/images/` (about 1800px on the long edge is plenty) and refer to them by
@@ -91,6 +103,6 @@ npm install
 npm run dev
 ```
 
-`npm run build` checks every text and background color pair against WCAG AA first
+`npm run build` checks every text and background color pair, in both themes, against WCAG AA first
 (`scripts/check-contrast.mjs`, colors from `src/palette.json`), then builds to `dist/`.
 `npm run favicon` redraws the "OG" favicon.
